@@ -1,0 +1,62 @@
+This is a project to try and dynamically roll in MTI (Multiple Table 
+Inheritance) as seamlessly as possible into ActiveRecord. For now to
+use it you need to have STI working first, then have something like 
+this:
+
+classes:
+
+require 'lib/psuedo_multiple_table_inheritence'
+class Animal < ActiveRecord::Base
+  include MTI
+end
+
+class Cat < Animal
+end
+
+class Dog < Animal
+end
+
+schema:
+  create_table "animals", :force => true do |t|
+    t.string "name"
+    t.string "type"
+  end
+  create_table "cat_attributes", :force => true do |t|
+    t.integer "cat_id"
+    t.integer "mice_eaten"
+  end
+  create_table "dog_attributes", :force => true do |t|
+    t.integer "cat_id"
+    t.integer "cats_chased"
+  end
+
+
+Then you can do things like:
+
+c = Cat.new(:name => "Sparticus")
+c.mice_eaten = 12
+c.save
+
+d = Dog.new(:name => "Divine")
+d.cats_chased = 3
+d.save
+
+Animal.all
+=> [#<Cat id: 1, name: "Sparticus", type: "Cat">, 
+  #<Dog id: 2, name: "Divine", type: "Dog">]
+
+Animal.first.mice_eaten
+=> 12
+
+Dog.first.cats_chased
+=> 3
+
+
+TODO:
+
+* You can't set MTI-attributes (such as mice_eaten or cats_chased) in 
+  the new or create methods (e.g. Dog.new(:cats_chased => 3) raises 
+  an exception)
+
+* Finding is all kindsa broke still. Don't expect to be able to query 
+  on much just yet.
