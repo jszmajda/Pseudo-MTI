@@ -26,7 +26,7 @@ schema:
     t.integer "mice_eaten"
   end
   create_table "dog_attributes", :force => true do |t|
-    t.integer "cat_id"
+    t.integer "dog_id"
     t.integer "cats_chased"
   end
 
